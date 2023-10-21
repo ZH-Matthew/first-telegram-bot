@@ -64,16 +64,19 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 LocalDateTime notification_send_time = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
                 String notification_message = matcher.group(3); //!!! узнать почему тут именно цифра 3
 
-                Notification notification = new Notification(chatId,notification_message,notification_send_time);
+                Notification notification = new Notification();
+                notification.setNotification(notification_message);
+                notification.setNotification_send_time(notification_send_time);
+                notification.setChat_id(chatId);
                 notificationRepository.save(notification);
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    @Scheduled(cron = "0 * * ? * *")
+  /*  @Scheduled(cron = "0 * * ? * *")
     public void findNotificationsByDateTime() {
         List<Notification> notificationsNow = notificationRepository.findNotificationsByNotification_send_time(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
-    }
+    }*/
 
 }

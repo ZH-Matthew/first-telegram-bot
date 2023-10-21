@@ -15,11 +15,6 @@ public class Notification {
     private String notification;
     private LocalDateTime notification_send_time;
 
-    public Notification(Long chat_id, String notification, LocalDateTime notification_send_time) {
-        this.chat_id = chat_id;
-        this.notification = notification;
-        this.notification_send_time = notification_send_time;
-    }
 
     public Long getId() {
         return id;
