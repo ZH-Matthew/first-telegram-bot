@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-//    List<Notification> findNotificationsByNotification_send_time(LocalDateTime notification_send_time);
+    //метод выкидывающий Exception
+    List<Notification> findNotificationsByNotification_send_time(LocalDateTime notification_send_time);
 }
