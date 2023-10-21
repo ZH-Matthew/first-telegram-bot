@@ -13,7 +13,7 @@ public class Notification {
 
     private Long chat_id;
     private String notification;
-    private LocalDateTime notification_send_time;
+    private LocalDateTime dateTime;
 
 
     public Long getId() {
@@ -40,11 +40,11 @@ public class Notification {
         this.notification = notification;
     }
 
-    public LocalDateTime getNotification_send_time() {
-        return notification_send_time;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setNotification_send_time(LocalDateTime notification_send_time) {
-        this.notification_send_time = notification_send_time;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }

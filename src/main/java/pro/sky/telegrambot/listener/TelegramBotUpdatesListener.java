@@ -66,7 +66,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
                 Notification notification = new Notification();
                 notification.setNotification(notification_message);
-                notification.setNotification_send_time(notification_send_time);
+                notification.setDateTime(notification_send_time);
                 notification.setChat_id(chatId);
                 notificationRepository.save(notification);
             }
@@ -74,14 +74,14 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    /*@Scheduled(cron = "0 * * ? * *")
+    @Scheduled(cron = "0 * * ? * *")
     public void findNotificationsByDateTime() {
-        List<Notification> notificationsNow = notificationRepository.findNotificationsByNotification_send_time(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+        List<Notification> notificationsNow = notificationRepository.findByDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         notificationsNow.forEach(notification -> {
             SendMessage message = new SendMessage(notification.getChat_id(), notification.getNotification());
             SendResponse response = telegramBot.execute(message);
             response.isOk();
         });
-    }*/
+    }
 
 }
