@@ -49,26 +49,32 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             //проверка на /start
             if (userMessage.equals("/start")){
+                logger.debug("there was a match with /start");
                 String messageText = "О! Привет!";
                 SendMessage message = new SendMessage(chatId, messageText);
                 SendResponse response = telegramBot.execute(message);
                 response.isOk();
                 response.errorCode();
+                logger.info("welcome message sent sent to user: {}",chatId);
             }
 
             //парсинг сообщения и сохранение в БД
             Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");  //создали паттерн (условие поиска)
             Matcher matcher = pattern.matcher(userMessage);                                 //проверили сообщение по условию (паттерну) на соответствие
+            logger.debug("checking the correctness of the message recording has begun: {}",userMessage);
             if (matcher.matches()) {                                                        //если условие удовлетворено
+                logger.debug("the user message satisfies the notification recording condition");
                 String date = matcher.group(1);                                             //разделили сообщение по частям
                 LocalDateTime notification_send_time = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-                String notification_message = matcher.group(3); //!!! узнать почему тут именно цифра 3
-
+                String notification_message = matcher.group(3);
                 Notification notification = new Notification();
                 notification.setNotification(notification_message);
                 notification.setDateTime(notification_send_time);
                 notification.setChat_id(chatId);
                 notificationRepository.save(notification);
+                logger.info("notification saved in the database: {}",notification);
+            } else {
+                logger.debug("the message does not meet the conditions for recording notifications");
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -76,11 +82,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     @Scheduled(cron = "0 * * ? * *")
     public void findNotificationsByDateTime() {
+        logger.debug("the search for relevant notifications to send has begun");
         List<Notification> notificationsNow = notificationRepository.findByDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         notificationsNow.forEach(notification -> {
             SendMessage message = new SendMessage(notification.getChat_id(), notification.getNotification());
             SendResponse response = telegramBot.execute(message);
             response.isOk();
+            logger.debug("Notification: {} sent to user : {}",notification.getNotification(),notification.getChat_id());
         });
     }
 
