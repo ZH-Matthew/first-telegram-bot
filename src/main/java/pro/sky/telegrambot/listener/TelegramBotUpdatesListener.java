@@ -44,7 +44,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
-            String userMessage = update.message().text();
+            String userMessage = update.message().text(); //замокать update message text на /start?
             Long chatId = update.message().chat().id();
 
             //проверка на /start
@@ -52,7 +52,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 logger.debug("there was a match with /start");
                 String messageText = "О! Привет!";
                 SendMessage message = new SendMessage(chatId, messageText);
-                SendResponse response = telegramBot.execute(message);
+                SendResponse response = telegramBot.execute(message); //замокать execute на "О! Привет!" ?
                 response.isOk();
                 response.errorCode();
                 logger.info("welcome message sent sent to user: {}",chatId);
