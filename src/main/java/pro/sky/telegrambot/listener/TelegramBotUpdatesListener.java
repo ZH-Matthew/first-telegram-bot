@@ -26,35 +26,32 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
-    @Autowired
     private TelegramBot telegramBot;
+    NotificationRepository notificationRepository;
 
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
     }
 
-    NotificationRepository notificationRepository;
 
-    public TelegramBotUpdatesListener(NotificationRepository notificationRepository) {
+    public TelegramBotUpdatesListener(NotificationRepository notificationRepository, TelegramBot telegramBot) {
         this.notificationRepository = notificationRepository;
+        this.telegramBot = telegramBot;
     }
 
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
-            String userMessage = update.message().text(); //замокать update message text на /start?
+            String userMessage = update.message().text();
             Long chatId = update.message().chat().id();
 
             //проверка на /start
             if (userMessage.equals("/start")){
                 logger.debug("there was a match with /start");
                 String messageText = "О! Привет!";
-                SendMessage message = new SendMessage(chatId, messageText);
-                SendResponse response = telegramBot.execute(message); //замокать execute на "О! Привет!" ?
-                response.isOk();
-                response.errorCode();
+                sendMessage(chatId, messageText);
                 logger.info("welcome message sent sent to user: {}",chatId);
             }
 
@@ -85,11 +82,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         logger.debug("the search for relevant notifications to send has begun");
         List<Notification> notificationsNow = notificationRepository.findByDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         notificationsNow.forEach(notification -> {
-            SendMessage message = new SendMessage(notification.getChat_id(), notification.getNotification());
-            SendResponse response = telegramBot.execute(message);
-            response.isOk();
+            sendMessage(notification.getChat_id(),notification.getNotification());
             logger.debug("Notification: {} sent to user : {}",notification.getNotification(),notification.getChat_id());
         });
     }
 
+    public void sendMessage(Long chatId, String message) {
+        SendMessage sendMessage = new SendMessage(chatId,message);
+        SendResponse response = telegramBot.execute(sendMessage);
+        response.isOk();
+        response.errorCode();
+    }
 }
